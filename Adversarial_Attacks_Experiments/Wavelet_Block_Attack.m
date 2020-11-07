@@ -13,10 +13,10 @@ sz = function_params.net.Layers(1).InputSize;
 function_params.kappa = 0;
 
 pictures = dir(fullfile('imgs_test', '*.JPEG'));
-num_images = 3; % length(pictures);
+num_images = length(pictures);
 
 % ======================= Choose the transform ======================== %
- function_params.transform = 'db9';
+ function_params.transform = 'db15';
  level = 3;
 
  % ================================ ZORO Parameters ==================== %
@@ -41,12 +41,24 @@ Final_Labels = zeros(num_images,1);
 Attack_Success = zeros(num_images,1);
 ell_2_difference = zeros(num_images,1);
 ell_0_difference = zeros(num_images,1);
+Samples_to_success = zeros(num_images,1);
+Attacked_Images_Cell = cell(num_images,3);
 
 for i = 1:num_images
+    disp(i)
     target_image = imread(fullfile(cd,'imgs_test', pictures(i).name));
+    % Next block of code deals with gray scale images by copying the gray
+    % layer into the R,G and B layers.
+    if length(size(target_image)) == 2
+        I1 = [target_image;target_image;target_image];
+        [r,c] = size(I1);
+        target_image = permute(reshape(I1',[c,r/3,3]),[2,1,3]);
+    end
     target_image = imresize(target_image,sz(1:2));
     target_image = double(target_image)/255;
     function_params.target_image = target_image;
+    % == Store True Image
+    Attacked_Images_Cell{i,1} = target_image;
     % == Classify the unperturbed image.
     [label,scores] = classify(function_params.net,255*target_image);
     [~,idx] = sort(scores,'descend');
@@ -69,18 +81,10 @@ for i = 1:num_images
     ell_0_difference(i) = nnz(target_image - Attacked_image);
     Final_Labels(i) = final_label;
     Attack_Success(i) = Success;
+    Samples_to_success(i) = sum(num_samples_vec);
+    % == Store attacked image and noise
+    Attacked_Images_Cell{i,2} = Attacking_Noise;
+    Attacked_Images_Cell{i,3} = Attacked_image;
 end
 
-
-
-
-
-
-
-figure, imshow(Attacked_image)
-
-% === Plot function value
-xx = cumsum(num_samples_vec);
-f_vals = f_vals(f_vals ~= 0);
-figure();
-semilogy(xx, f_vals,'r*')
+save([datestr(now), '.mat'])

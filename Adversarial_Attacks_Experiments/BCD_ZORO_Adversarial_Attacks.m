@@ -178,8 +178,8 @@ else
         %i
         if function_handle == "ImageEvaluate"
             cosamp_params.delta = delta1 * norm(grad_estimate);
-            %S = datasample(1:length(function_params.c),D,'Replace',false);
-            S = datasample(function_params.nzlist,D,'Replace',false); % Only change non-zeros
+            S = datasample(1:length(function_params.c),D,'Replace',false);
+            %S = datasample(function_params.nzlist,D,'Replace',false); % Only change non-zeros
             function_params.S = S;
             
             [f_est,grad_estimate] = CosampGradEstimate(function_handle,x,cosamp_params,function_params);
@@ -199,7 +199,7 @@ else
             for j = 1:length(S)
                 c2(S(j)) = c2(S(j)) + x(j);
             end
-            I_attack = waverec2(c2,function_params.shape,'db9');
+            I_attack = waverec2(c2,function_params.shape,function_params.transform);
             I_attack = I_attack*255;
             label = classify(function_params.net, I_attack)
             if label ~= function_params.label
