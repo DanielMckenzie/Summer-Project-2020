@@ -8,7 +8,7 @@
 clear, close all, clc;
 
 % ============== Load the network and images ================= %
-function_params.net = squeezenet;
+function_params.net = inceptionv3; %squeezenet;
 sz = function_params.net.Layers(1).InputSize;
 function_params.kappa = 0;
 
@@ -41,6 +41,8 @@ Final_Labels = zeros(num_images,1);
 Attack_Success = zeros(num_images,1);
 ell_2_difference = zeros(num_images,1);
 ell_0_difference = zeros(num_images,1);
+ell_2_difference_wavelet = zeros(num_images,1);
+ell_0_difference_wavelet = zeros(num_images,1);
 Samples_to_success = zeros(num_images,1);
 Attacked_Images_Cell = cell(num_images,3);
 
@@ -76,7 +78,7 @@ for i = 1:num_images
     ZORO_params.step_size = 3;% Step size
     ZORO_params.x0 = zeros(function_params.D,1);
     % ====================== run ZORO Attack ======================= %
-    [Attacking_Noise, Attacked_image, f_vals, iter, num_samples_vec, Success, final_label] = BCD_ZORO_Adversarial_Attacks(function_handle,function_params,ZORO_params);
+    [Attacking_Noise, Attacked_image, f_vals, iter, num_samples_vec, Success, final_label,Wavelet_distortion_ell_0,Wavelet_distortion_ell_2] = BCD_ZORO_Adversarial_Attacks(function_handle,function_params,ZORO_params);
     ell_2_difference(i) = norm(target_image(:) - Attacked_image(:),2);
     ell_0_difference(i) = nnz(target_image - Attacked_image);
     Final_Labels(i) = final_label;
@@ -85,6 +87,11 @@ for i = 1:num_images
     % == Store attacked image and noise
     Attacked_Images_Cell{i,2} = Attacking_Noise;
     Attacked_Images_Cell{i,3} = Attacked_image;
+    % == Store distortion in wavelet domain
+    ell_0_difference_wavelet(i) = Wavelet_distortion_ell_0;
+    ell_2_difference_wavelet(i) = Wavelet_distortion_ell_2;
+    
 end
 
+function_params.net = 'inceptionv3';  % clear this variable before saving
 save([datestr(now), '.mat'])
