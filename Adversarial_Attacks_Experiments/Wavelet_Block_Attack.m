@@ -11,9 +11,9 @@ clear, close all, clc;
 function_params.net = inceptionv3; %squeezenet;
 sz = function_params.net.Layers(1).InputSize;
 function_params.kappa = 0;
-Classes = function_params.net.Layers(316).Classes; % list of all imagenet classes.
+Classes = function_params.net.Layers(end).Classes; % list of all imagenet classes.
 
-pictures = dir(fullfile('imgs_test', '*.jpg'));
+pictures = dir(fullfile('imgs', '*.jpg'));
 num_images = length(pictures);
 
 % ======================= Choose the transform ======================== %
@@ -24,7 +24,7 @@ num_images = length(pictures);
 ZORO_params.num_iterations = 20; % number of iterations
 ZORO_params.delta1 = 0.0005;
 ZORO_params.init_grad_estimate = 100;
-ZORO_params.max_time = 300;
+ZORO_params.max_time = 360;
 ZORO_params.num_blocks = 100;
 ZORO_params.Type = "BCD";
 function_handle = "ImageEvaluate";
@@ -45,11 +45,11 @@ ell_0_difference = zeros(num_images,1);
 ell_2_difference_wavelet = zeros(num_images,1);
 ell_0_difference_wavelet = zeros(num_images,1);
 Samples_to_success = zeros(num_images,1);
-Attacked_Images_Cell = cell(num_images,3);
+%Attacked_Images_Cell = cell(num_images,3);
 
 for i = 1:num_images
     disp(['Now attacking image number ',num2str(i)])
-    target_image = imread(fullfile(cd,'imgs_test', pictures(i).name));
+    target_image = imread(fullfile(cd,'imgs', pictures(i).name));
     % Next block of code deals with gray scale images by copying the gray
     % layer into the R,G and B layers.
     if length(size(target_image)) == 2
@@ -61,7 +61,7 @@ for i = 1:num_images
     target_image = double(target_image)/255;
     function_params.target_image = target_image;
     % == Store True Image
-    Attacked_Images_Cell{i,1} = target_image;
+    %Attacked_Images_Cell{i,1} = target_image;
     % == Classify the unperturbed image.
     % Note that the test set of imagenet stores the true label of the
     % image in its name. This block of code extracts that.
@@ -95,8 +95,8 @@ for i = 1:num_images
     Attack_Success(i) = Success;
     Samples_to_success(i) = sum(num_samples_vec);
     % == Store attacked image and noise
-    Attacked_Images_Cell{i,2} = Attacking_Noise;
-    Attacked_Images_Cell{i,3} = Attacked_image;
+    %Attacked_Images_Cell{i,2} = Attacking_Noise;
+    %Attacked_Images_Cell{i,3} = Attacked_image;
     % == Store distortion in wavelet domain
     ell_0_difference_wavelet(i) = Wavelet_distortion_ell_0;
     ell_2_difference_wavelet(i) = Wavelet_distortion_ell_2;
