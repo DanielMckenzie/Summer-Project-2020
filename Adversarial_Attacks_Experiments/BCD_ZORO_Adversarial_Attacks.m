@@ -113,7 +113,7 @@ if (Type == "BCD") || (Type == "BCCD")  % block coordinate descent methods.
     
     for i = 1:num_iterations
         tic
-        %i
+        disp(['Number of iterations = ',num2str(i)])
         cosamp_params.delta = delta1 * norm(grad_estimate);
         coord_index = randi(J);% randomly select a block
         block = datasample(1:function_params.D,block_size,'Replace',false);
