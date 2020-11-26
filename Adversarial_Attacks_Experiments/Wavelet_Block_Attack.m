@@ -8,11 +8,12 @@
 clear, close all, clc;
 
 % ============== Load the network and images ================= %
-function_params.net = squeezenet;
+function_params.net = inceptionv3; %squeezenet;
 sz = function_params.net.Layers(1).InputSize;
 function_params.kappa = 0;
+Classes = function_params.net.Layers(end).Classes; % list of all imagenet classes.
 
-pictures = dir(fullfile('imgs_test', '*.JPEG'));
+pictures = dir(fullfile('imgs', '*.jpg'));
 num_images = length(pictures);
 
 % ======================= Choose the transform ======================== %
@@ -23,7 +24,7 @@ num_images = length(pictures);
 ZORO_params.num_iterations = 20; % number of iterations
 ZORO_params.delta1 = 0.0005;
 ZORO_params.init_grad_estimate = 100;
-ZORO_params.max_time = 180;
+ZORO_params.max_time = 360;
 ZORO_params.num_blocks = 100;
 ZORO_params.Type = "BCD";
 function_handle = "ImageEvaluate";
@@ -41,12 +42,14 @@ Final_Labels = zeros(num_images,1);
 Attack_Success = zeros(num_images,1);
 ell_2_difference = zeros(num_images,1);
 ell_0_difference = zeros(num_images,1);
+ell_2_difference_wavelet = zeros(num_images,1);
+ell_0_difference_wavelet = zeros(num_images,1);
 Samples_to_success = zeros(num_images,1);
-Attacked_Images_Cell = cell(num_images,3);
+%Attacked_Images_Cell = cell(num_images,3);
 
 for i = 1:num_images
-    disp(i)
-    target_image = imread(fullfile(cd,'imgs_test', pictures(i).name));
+    disp(['Now attacking image number ',num2str(i)])
+    target_image = imread(fullfile(cd,'imgs', pictures(i).name));
     % Next block of code deals with gray scale images by copying the gray
     % layer into the R,G and B layers.
     if length(size(target_image)) == 2
@@ -58,13 +61,22 @@ for i = 1:num_images
     target_image = double(target_image)/255;
     function_params.target_image = target_image;
     % == Store True Image
-    Attacked_Images_Cell{i,1} = target_image;
+    %Attacked_Images_Cell{i,1} = target_image;
     % == Classify the unperturbed image.
-    [label,scores] = classify(function_params.net,255*target_image);
-    [~,idx] = sort(scores,'descend');
-    function_params.true_id = idx(1);
+    % Note that the test set of imagenet stores the true label of the
+    % image in its name. This block of code extracts that.
+    
+    splitStr = regexp(pictures(i).name,'\.','split');
+    true_idx = str2num(splitStr{1});
+    function_params.true_id = true_idx;
+    label = Classes(true_idx);
     function_params.label = label;
     True_Labels(i) = label;
+    %[label,scores] = classify(function_params.net,255*target_image);
+    %[~,idx] = sort(scores,'descend');
+    %function_params.true_id = idx(1);
+    %function_params.label = label;
+    %True_Labels(i) = label;
     disp(label);
     [c,shape] = wavedec2(target_image,level,function_params.transform);
     % ====== Additional Parameters
@@ -76,15 +88,20 @@ for i = 1:num_images
     ZORO_params.step_size = 3;% Step size
     ZORO_params.x0 = zeros(function_params.D,1);
     % ====================== run ZORO Attack ======================= %
-    [Attacking_Noise, Attacked_image, f_vals, iter, num_samples_vec, Success, final_label] = BCD_ZORO_Adversarial_Attacks(function_handle,function_params,ZORO_params);
+    [Attacking_Noise, Attacked_image, f_vals, iter, num_samples_vec, Success, final_label,Wavelet_distortion_ell_0,Wavelet_distortion_ell_2] = BCD_ZORO_Adversarial_Attacks(function_handle,function_params,ZORO_params);
     ell_2_difference(i) = norm(target_image(:) - Attacked_image(:),2);
     ell_0_difference(i) = nnz(target_image - Attacked_image);
     Final_Labels(i) = final_label;
     Attack_Success(i) = Success;
     Samples_to_success(i) = sum(num_samples_vec);
     % == Store attacked image and noise
-    Attacked_Images_Cell{i,2} = Attacking_Noise;
-    Attacked_Images_Cell{i,3} = Attacked_image;
+    %Attacked_Images_Cell{i,2} = Attacking_Noise;
+    %Attacked_Images_Cell{i,3} = Attacked_image;
+    % == Store distortion in wavelet domain
+    ell_0_difference_wavelet(i) = Wavelet_distortion_ell_0;
+    ell_2_difference_wavelet(i) = Wavelet_distortion_ell_2;
+    
 end
 
+function_params.net = 'inceptionv3';  % clear this variable before saving
 save([datestr(now), '.mat'])

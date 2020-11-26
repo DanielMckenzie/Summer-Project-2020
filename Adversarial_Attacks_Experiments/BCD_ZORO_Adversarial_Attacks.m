@@ -1,4 +1,4 @@
-function [Attacking_Noise, Attacked_image, f_vals, iter, num_samples_vec, Success,Final_Label] = BCD_ZORO_Adversarial_Attacks(function_handle,function_params,ZORO_params)
+function [Attacking_Noise, Attacked_image, f_vals, iter, num_samples_vec, Success,Final_Label,Wavelet_distortion_ell_0,Wavelet_distortion_ell_2] = BCD_ZORO_Adversarial_Attacks(function_handle,function_params,ZORO_params)
 
 % Basic Implementation of ZORO with flexible sensing matrix.
 % ======================== INPUTS ================================= %
@@ -29,6 +29,8 @@ grad_estimate = ZORO_params.init_grad_estimate;
 x = ZORO_params.x0;
 step_size = ZORO_params.step_size;
 max_time = ZORO_params.max_time;
+Wavelet_distortion_ell_0 = NaN;
+Wavelet_distortion_ell_2 = NaN;
 
 iter = num_iterations;
 Final_Label = function_params.true_id;
@@ -111,7 +113,7 @@ if (Type == "BCD") || (Type == "BCCD")  % block coordinate descent methods.
     
     for i = 1:num_iterations
         tic
-        %i
+        disp(['Number of iterations = ',num2str(i)])
         cosamp_params.delta = delta1 * norm(grad_estimate);
         coord_index = randi(J);% randomly select a block
         block = datasample(1:function_params.D,block_size,'Replace',false);
@@ -144,6 +146,8 @@ if (Type == "BCD") || (Type == "BCCD")  % block coordinate descent methods.
                 disp('Attack succesful')
                 Final_Label = new_label;
                 Success = 1;
+                Wavelet_distortion_ell_0 = nnz(x);
+                Wavelet_distortion_ell_2 = norm(x,2);
                 break
             end
         else
@@ -206,6 +210,8 @@ else
                 iter = i;
                 disp('Attack succesful')
                 Success = 1;
+                Wavelet_distortion_ell_0 = nnz(x);
+                Wavelet_distortion_ell_2 = norm(x,2);
                 break
             end
             
