@@ -8,7 +8,7 @@
 clear, close all, clc;
 
 % ============== Load the network and images ================= %
-function_params.net = inceptionv3; %squeezenetinceptionv3;
+function_params.net = inceptionv3; %squeezenet;
 sz = function_params.net.Layers(1).InputSize;
 function_params.kappa = 0;
 Classes = function_params.net.Layers(end).Classes; % list of all imagenet classes.
@@ -79,7 +79,7 @@ while num_attacked_images <= num_attack
             disp(['True label is ', true_label])
             disp('Commencing with attack')
         end
-        i = i+1;
+        i = i + 1;
     end
     function_params.true_id = true_idx;
     Attacked_Images_Cell{num_attacked_images,1} = target_image; % store true image
