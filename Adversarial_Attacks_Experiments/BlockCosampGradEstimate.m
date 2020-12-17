@@ -35,7 +35,7 @@ Z_padded(:,block) = Z;
 y = zeros(num_samples,1);
 [y_temp2,~] = feval(function_handle,x,function_params); % query at f(x)
 function_estimate = y_temp2;
-for i = 1:num_samples
+parfor i = 1:num_samples
     [y_temp1,~] = feval(function_handle,x + delta*Z_padded(i,:)',function_params); % query at f(x+delta z_i)
     y(i) = (y_temp1-y_temp2)/(sqrt(num_samples)*delta); % finite difference approximation to directional derivative.
 end

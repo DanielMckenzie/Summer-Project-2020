@@ -19,17 +19,17 @@ pictures = dir(fullfile(directory, '*.jpg'));
 num_images = length(pictures);
 Order_of_Attack = randperm(num_images);
 num_attack = 1000;
-num_attacked_images = 0; % Counter to keep track of how many images attacked.
+num_attacked_images = 1; % Counter to keep track of how many images attacked.
 
 % ======================= Choose the transform ======================== %
  function_params.transform = 'db15';
  level = 3;
 
  % ================================ ZORO Parameters ==================== %
-ZORO_params.num_iterations = 20; % number of iterations
+ZORO_params.num_iterations = 30; % number of iterations
 ZORO_params.delta1 = 0.0005;
 ZORO_params.init_grad_estimate = 100;
-ZORO_params.max_time = 360;
+ZORO_params.max_time = 1200;
 ZORO_params.num_blocks = 500;
 ZORO_params.Type = "BCD";
 function_handle = "ImageEvaluate";
@@ -54,7 +54,7 @@ Attacked_Images_Cell = cell(num_attack,3);
 attacked_image_id = zeros(num_attack,1);
 
 i = 1; % counter keeping track of which image we are currently considering.
-while num_attacked_images <= 1000
+while num_attacked_images <= num_attack
     flag = 0;
     while flag == 0
         ii = Order_of_Attack(i);
@@ -79,40 +79,40 @@ while num_attacked_images <= 1000
             disp(['True label is ', true_label])
             disp('Commencing with attack')
         end
-        i = i+1;
+        i = i + 1;
     end
     function_params.true_id = true_idx;
-    Attacked_Images_Cell{i,1} = target_image; % store true image
+    Attacked_Images_Cell{num_attacked_images,1} = target_image; % store true image
     target_image = double(target_image)/255;
     function_params.target_image = target_image;
     function_params.label = true_label;
-    True_Labels(i) = true_label;
+    True_Labels(num_attacked_images) = true_label;
     disp(['Now attacking image number ',num2str(ii)])
     
     [c,shape] = wavedec2(target_image,level,function_params.transform);
     % ====== Additional Parameters
     function_params.shape = shape;
-    function_params.epsilon = 5;
+    function_params.epsilon = 5; % Box Constraint params
     function_params.D = length(c);
     ZORO_params.D = length(c);
     ZORO_params.sparsity = 0.05*ZORO_params.D;
-    ZORO_params.step_size = 3;% Step size
+    ZORO_params.step_size = 3; % Step size
     ZORO_params.x0 = zeros(function_params.D,1);
     % ====================== run ZORO Attack ======================= %
     outputs = BCD_ZORO_Adversarial_Attacks(function_handle,function_params,ZORO_params);
-    ell_2_difference(i) = norm(outputs.Attacking_Noise(:),2);
-    disp(['ell_2 norm of attacking noise in pixel domain is ',num2str(ell_2_difference(i))])
-    ell_0_difference(i) = nnz(outputs.Attacking_Noise(:));
-    disp(['ell_0 norm of attacking noise in pixel domain is ',num2str(ell_0_difference(i))])
-    Final_Labels(i) = outputs.Final_Label;
-    Attack_Success(i) = outputs.Success;
-    Samples_to_success(i) = sum(outputs.num_samples_vec);
+    ell_2_difference(num_attacked_images) = norm(outputs.Attacking_Noise(:),2);
+    disp(['ell_2 norm of attacking noise in pixel domain is ',num2str(ell_2_difference(num_attacked_images))])
+    ell_0_difference(num_attacked_images) = nnz(outputs.Attacking_Noise(:));
+    disp(['ell_0 norm of attacking noise in pixel domain is ',num2str(ell_0_difference(num_attacked_images))])
+    Final_Labels(num_attacked_images) = outputs.Final_Label;
+    Attack_Success(num_attacked_images) = outputs.Success;
+    Samples_to_success(num_attacked_images) = sum(outputs.num_samples_vec);
     % == Store attacked image and noise
-    Attacked_Images_Cell{i,2} = outputs.Attacking_Noise;
-    Attacked_Images_Cell{i,3} = outputs.Attacked_image;
+    Attacked_Images_Cell{num_attacked_images,2} = outputs.Attacking_Noise;
+    Attacked_Images_Cell{num_attacked_images,3} = outputs.Attacked_image;
     % == Store distortion in wavelet domain
-    ell_0_difference_wavelet(i) = outputs.Wavelet_distortion_ell_0;
-    ell_2_difference_wavelet(i) = outputs.Wavelet_distortion_ell_2;
+    ell_0_difference_wavelet(num_attacked_images) = outputs.Wavelet_distortion_ell_0;
+    ell_2_difference_wavelet(num_attacked_images) = outputs.Wavelet_distortion_ell_2;
     
     % don't forget to increment!
     num_attacked_images = num_attacked_images + 1

@@ -26,7 +26,7 @@ num_iterations = ZORO_params.num_iterations;
 Type = ZORO_params.Type;
 delta1 = ZORO_params.delta1;
 grad_estimate = ZORO_params.init_grad_estimate;
-x = ZORO_params.x0;
+x = gpuArray(ZORO_params.x0);
 step_size = ZORO_params.step_size;
 max_time = ZORO_params.max_time;
 Wavelet_distortion_ell_0 = NaN;
@@ -82,7 +82,7 @@ else  % This handles block methods.
         Z1 = gallery('circul',z1);
         SSet = datasample(1:block_size,samples_per_block,'Replace',false);
         Z2 = Z1(SSet,:);
-        Z = zeros(num_samples,D);
+        Z = zeros(num_samples,D);x
         for i = 0:(J-1)
             Z((samples_per_block*i+1):(samples_per_block*i+samples_per_block),(block_size*i+1):(block_size*i+block_size)) = Z2;
         end
