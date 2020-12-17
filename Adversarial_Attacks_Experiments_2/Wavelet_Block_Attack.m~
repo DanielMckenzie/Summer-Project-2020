@@ -13,11 +13,10 @@ sz = function_params.net.Layers(1).InputSize;
 function_params.kappa = 0;
 Classes = function_params.net.Layers(end).Classes; % list of all imagenet classes.
 
-%directory = '../Adversarial_Attacks_Experiments/imgs'; % for Cottus
-directory = 'imgs'; % use this for small tests on PC.
+directory = '../Adversarial_Attacks_Experiments/imgs'; % for Cottus
+% directory = 'imgs' % use this for small tests on PC.
 pictures = dir(fullfile(directory, '*.jpg'));
 num_images = length(pictures);
-rng(1,'twister')
 Order_of_Attack = randperm(num_images);
 num_attack = 1000;
 num_attacked_images = 1; % Counter to keep track of how many images attacked.
@@ -28,7 +27,7 @@ num_attacked_images = 1; % Counter to keep track of how many images attacked.
 
  % ================================ ZORO Parameters ==================== %
 ZORO_params.num_iterations = 30; % number of iterations
-ZORO_params.delta1 = 0.005;
+ZORO_params.delta1 = 0.0005;
 ZORO_params.init_grad_estimate = 100;
 ZORO_params.max_time = 1200;
 ZORO_params.num_blocks = 500;
@@ -97,7 +96,7 @@ while num_attacked_images <= num_attack
     function_params.D = length(c);
     ZORO_params.D = length(c);
     ZORO_params.sparsity = 0.05*ZORO_params.D;
-    ZORO_params.step_size = 3e-4; % Step size. 3e-4 is value used by Kaidi Xu
+    ZORO_params.step_size = 3e-4; % Step size. 3e-4 is value used by Kaidi 
     ZORO_params.x0 = zeros(function_params.D,1);
     % ====================== run ZORO Attack ======================= %
     outputs = BCD_ZORO_Adversarial_Attacks(function_handle,function_params,ZORO_params);
