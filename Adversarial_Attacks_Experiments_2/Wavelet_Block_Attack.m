@@ -27,13 +27,8 @@ num_attacked_images = 1; % Counter to keep track of how many images attacked.
  level = 3;
 
  % ================================ ZORO Parameters ==================== %
-<<<<<<< HEAD
 ZORO_params.num_iterations = 160; % number of iterations
 ZORO_params.delta1 = 0.01; % 0.0005
-=======
-ZORO_params.num_iterations = 30; % number of iterations
-ZORO_params.delta1 = 0.005;
->>>>>>> 3393aeddb6264a3111b246af00bdbb5d79fbc936
 ZORO_params.init_grad_estimate = 100;
 ZORO_params.max_time = 2400;
 ZORO_params.num_blocks = 3960;
@@ -102,11 +97,7 @@ while num_attacked_images < num_attack
     function_params.D = length(c);
     ZORO_params.D = length(c);
     ZORO_params.sparsity = 0.05*ZORO_params.D;
-<<<<<<< HEAD
     ZORO_params.step_size = 10; % Step size
-=======
-    ZORO_params.step_size = 3e-4; % Step size. 3e-4 is value used by Kaidi Xu
->>>>>>> 3393aeddb6264a3111b246af00bdbb5d79fbc936
     ZORO_params.x0 = zeros(function_params.D,1);
     % ====================== run ZORO Attack ======================= %
     outputs = BCD_ZORO_Adversarial_Attacks(function_handle,function_params,ZORO_params);
