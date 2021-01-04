@@ -24,7 +24,7 @@ D = ZORO_params.D;
 sparsity = ZORO_params.sparsity;
 num_iterations = ZORO_params.num_iterations;
 Type = ZORO_params.Type;
-%delta1 = ZORO_params.delta1;
+delta1 = ZORO_params.delta1;
 %grad_estimate = ZORO_params.init_grad_estimate;
 x = ZORO_params.x0;
 step_size = ZORO_params.step_size;
@@ -68,7 +68,8 @@ elseif (Type == "BCCD")
 end
 
 cosamp_params.Z = Z;
-cosamp_params.delta = 0.01;
+% cosamp_params.delta = 0.01;
+cosamp_params.delta = delta1;
 % ========== Now do ZORO
 % This code only allows for block methods
     
@@ -79,6 +80,12 @@ P = randperm(function_params.D);
 
 for i = 1:num_iterations
     tic
+%    if (i == num_iterations/2)
+%    	step_size = step_size*2;
+%    end
+%    if (i == 24)
+%	step_size = step_size*1.5;
+%    end
     disp(['Number of iterations = ',num2str(i)])
     coord_index = randi(J-1);% randomly select a block HACK: avioding the last block which may be smaller
     block = P(coord_index:coord_index+block_size-1);
@@ -135,6 +142,8 @@ for i = 1:num_iterations
         outputs.num_samples_vec = num_samples_vec;
         outputs.Success = Success;
         outputs.Final_Label = Final_Label;
+        Wavelet_distortion_ell_0 = nnz(x);
+        Wavelet_distortion_ell_2 = norm(x,2);
         outputs.Wavelet_distortion_ell_0 = Wavelet_distortion_ell_0;
         outputs.Wavelet_distortion_ell_2 = Wavelet_distortion_ell_2;
 
@@ -144,6 +153,8 @@ for i = 1:num_iterations
         break
     end
 end
+%Wavelet_distortion_ell_0 = nnz(x);
+%Wavelet_distortion_ell_2 = norm(x,2);
 % Now pack all the outputs into a struct.
 outputs.Attacking_Noise = Attacking_Noise;
 outputs.Attacked_image = Attacked_image;
