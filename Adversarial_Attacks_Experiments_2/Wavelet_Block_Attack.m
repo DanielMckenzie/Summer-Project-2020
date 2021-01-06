@@ -8,13 +8,13 @@
 clear, close all, clc;
 
 % ============== Load the network and images ================= %
-function_params.net = inceptionv3; %squeezenet;
+function_params.net = inceptionv3;
 sz = function_params.net.Layers(1).InputSize;
 function_params.kappa = 0;
 Classes = function_params.net.Layers(end).Classes; % list of all imagenet classes.
 
-%directory = '../Adversarial_Attacks_Experiments/imgs'; % for Cottus
-directory = 'imgs'; % use this for small tests on PC.
+directory = '../Adversarial_Attacks_Experiments/imgs'; % for Cottus
+% directory = 'imgs' % use this for small tests on PC.
 pictures = dir(fullfile(directory, '*.jpg'));
 num_images = length(pictures);
 rng(1,'twister')
@@ -23,15 +23,15 @@ num_attack = 1000;
 num_attacked_images = 1; % Counter to keep track of how many images attacked.
 
 % ======================= Choose the transform ======================== %
- function_params.transform = 'db15';
+ function_params.transform = 'db45';
  level = 3;
 
  % ================================ ZORO Parameters ==================== %
-ZORO_params.num_iterations = 30; % number of iterations
-ZORO_params.delta1 = 0.005;
+ZORO_params.num_iterations = 160; % number of iterations
+ZORO_params.delta1 = 0.01; % 0.0005
 ZORO_params.init_grad_estimate = 100;
-ZORO_params.max_time = 1200;
-ZORO_params.num_blocks = 500;
+ZORO_params.max_time = 2400;
+ZORO_params.num_blocks = 3960;
 ZORO_params.Type = "BCD";
 function_handle = "ImageEvaluate";
 
@@ -55,7 +55,7 @@ Attacked_Images_Cell = cell(num_attack,3);
 attacked_image_id = zeros(num_attack,1);
 
 i = 1; % counter keeping track of which image we are currently considering.
-while num_attacked_images <= num_attack
+while num_attacked_images < num_attack
     flag = 0;
     while flag == 0
         ii = Order_of_Attack(i);
@@ -80,7 +80,7 @@ while num_attacked_images <= num_attack
             disp(['True label is ', true_label])
             disp('Commencing with attack')
         end
-        i = i + 1;
+        i = i+1;
     end
     function_params.true_id = true_idx;
     Attacked_Images_Cell{num_attacked_images,1} = target_image; % store true image
@@ -97,7 +97,7 @@ while num_attacked_images <= num_attack
     function_params.D = length(c);
     ZORO_params.D = length(c);
     ZORO_params.sparsity = 0.05*ZORO_params.D;
-    ZORO_params.step_size = 3e-4; % Step size. 3e-4 is value used by Kaidi Xu
+    ZORO_params.step_size = 10; % Step size
     ZORO_params.x0 = zeros(function_params.D,1);
     % ====================== run ZORO Attack ======================= %
     outputs = BCD_ZORO_Adversarial_Attacks(function_handle,function_params,ZORO_params);
