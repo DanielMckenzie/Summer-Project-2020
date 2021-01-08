@@ -1,5 +1,5 @@
 % ====================== Basic Wavelet Block Attack =================== %
-% Another attempt at a minimum workong example of an adversarial attack
+% Another attempt at a minimum working example of an adversarial attack
 % Daniel McKenzie 2020.8
 % Yuchen Lou 2020.8
 % ===================================================================== %
@@ -11,8 +11,8 @@ function_params.net = squeezenet;
 sz = function_params.net.Layers(1).InputSize;
 function_params.kappa = 0;
 
-pictures = dir(fullfile('imgs_test', '*.JPEG'));
-target_image = imread(fullfile(cd,'imgs_test', pictures(79).name));
+pictures = dir(fullfile('imgs_test', '*.jpg'));
+target_image = imread(fullfile(cd,'imgs_test', pictures(2).name));
 target_image = imresize(target_image,sz(1:2));
 target_image = double(target_image)/255;
 imshow(target_image);

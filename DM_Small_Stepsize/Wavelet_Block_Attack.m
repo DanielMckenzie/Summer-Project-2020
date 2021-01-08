@@ -23,7 +23,7 @@ num_attack = 100;
 num_attacked_images = 1; % Counter to keep track of how many images attacked.
 
 % ======================= Choose the transform ======================== %
- function_params.transform = 'db15';
+ function_params.transform = 'db45';
  level = 3;
 
  % ================================ ZORO Parameters ==================== %
@@ -31,7 +31,7 @@ ZORO_params.num_iterations = 30; % number of iterations
 ZORO_params.delta1 = 0.005;
 ZORO_params.init_grad_estimate = 100;
 ZORO_params.max_time = 1200;
-ZORO_params.num_blocks = 500;
+ZORO_params.num_blocks = 1000;
 ZORO_params.Type = "BCD";
 function_handle = "ImageEvaluate";
 
@@ -97,7 +97,7 @@ while num_attacked_images <= num_attack
     function_params.D = length(c);
     ZORO_params.D = length(c);
     ZORO_params.sparsity = 0.05*ZORO_params.D;
-    ZORO_params.step_size = 0.05; % Step size. 3e-4 is value used by Kaidi Xu
+    ZORO_params.step_size = 2.5; % Step size. 3e-4 is value used by Kaidi Xu
     ZORO_params.x0 = zeros(function_params.D,1);
     % ====================== run ZORO Attack ======================= %
     outputs = BCD_ZORO_Adversarial_Attacks(function_handle,function_params,ZORO_params);
