@@ -41,7 +41,7 @@ axis xy;
 % Will add noise at 500 randomly chosen coefficients
 RandomIndices = randi(111*16000,500,1);
 
-Noise = 0.5*randn(500,1) + 0.5*1i*randn(500,1); % complex noise.
+Noise = sqrt(0.25/2)*randn(500,1) + sqrt(0.25/2)*1i*randn(500,1); % complex noise.
 PerturbedSignal = WaveletCoefficients;
 PerturbedSignal(RandomIndices) = PerturbedSignal(RandomIndices) + Noise;
 figure, imagesc(time,f,abs(PerturbedSignal));

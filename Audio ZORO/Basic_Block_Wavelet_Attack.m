@@ -9,9 +9,9 @@ load('commandNet.mat')
 function_params.net = trainedNet;
 
 sz = function_params.net.Layers(1).InputSize;
-function_params.kappa = 0;
+function_params.kappa = 0.1;
 
-[sound_proto,fs] = audioread('testsound_protos/0ea0e2f4_nohash_0.wav');
+[sound_proto,fs] = audioread('testSounds/0ea0e2f4_nohash_0.wav');
 % Perform wavelet transform
 [target_audio_wavelet,~] = cwt(sound_proto,'morse');
 function_params.target_audio_wavelet = target_audio_wavelet;
@@ -36,7 +36,7 @@ disp(label);
 function_params.D = length(target_audio_wavelet(:));
 ZORO_params.D = function_params.D;
 % ================================ ZORO Parameters ==================== %
-ZORO_params.num_iterations = 20; % number of iterations
+ZORO_params.num_iterations = 25; % number of iterations
 ZORO_params.delta1 = 0.001;
 ZORO_params.init_grad_estimate = 100;
 ZORO_params.max_time = 180;
@@ -46,8 +46,8 @@ function_handle = "AudioEvaluate";
 
 function_params.shape = size(target_audio_wavelet);
 function_params.epsilon = 5; % Box Constraint params
-ZORO_params.sparsity = 0.01*ZORO_params.D; % 0.05*ZORO_params.D
-ZORO_params.step_size = 10; % Step size
+ZORO_params.sparsity = 0.05*ZORO_params.D; % 0.05*ZORO_params.D
+ZORO_params.step_size = 0.01; % Step size
 ZORO_params.x0 = zeros(function_params.D,1);
 
 

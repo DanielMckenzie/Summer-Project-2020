@@ -85,6 +85,7 @@ for i = 1:num_iterations
     cosamp_params.block = block;
     [f_est,grad_estimate] = BlockCosampGradEstimate(function_handle,x,cosamp_params,function_params);
     x = x - step_size*grad_estimate;
+    nnz(x)
     % Box Constraint
     %x(x > function_params.epsilon) = function_params.epsilon;
     %x(x < -function_params.epsilon) = -function_params.epsilon;
@@ -95,8 +96,10 @@ for i = 1:num_iterations
     
     Attacked_audio = function_params.target_audio_wavelet + Attacking_Noise;
     num_samples_vec(i) = samples_per_block;
-    [~,new_label] = AudioEvaluate(x,function_params);
+    [val,new_label,scores] = AudioEvaluate(x,function_params);
     disp(new_label);
+    disp(['Current loss is ',num2str(val)])
+    disp(scores)
     if isnan(function_params.target_id)
         if new_label ~= function_params.label
             iter = i;
