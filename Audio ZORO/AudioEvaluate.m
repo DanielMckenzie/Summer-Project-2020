@@ -1,4 +1,4 @@
-function [val,label] = AudioEvaluate(x,function_params)
+function [val,label,scores] = AudioEvaluate(x,function_params)
 
 % x -- a complex noise?
 
@@ -20,9 +20,10 @@ if isnan(function_params.target_id)
     end
 else
     f_Ntru = scores(function_params.target_id);
+    %f_tru = scores(idx(1)); % edit DM 01/12/2021
 end
 %val = -log(f_Ntru); % Targeted attack objective version
-%val = max(-function_params.kappa, log(f_tru) - log(f_Ntru));
-val = max(-function_params.kappa, f_tru - f_Ntru);
+val = max(-function_params.kappa, log(f_tru) - log(f_Ntru));
+%val = max(-function_params.kappa, f_tru - f_Ntru);
 
 end
