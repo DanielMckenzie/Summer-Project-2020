@@ -131,10 +131,8 @@ for i = 1:num_iterations
         disp('Max time reached!')
         % Now pack all the outputs into a struct.
         
-        % Note that now the attacked noise is still in wavelet domain!!!!
-        outputs.Attacking_Noise = Attacking_Noise;
-        % Note that now the attacked audio is still in wavelet domain!!!
-        outputs.Attacked_audio_wavelet = Attacked_audio;
+        outputs.Attacking_Noise = icwt(Attacking_Noise,'morse');
+        outputs.Attacked_Audio = icwt(Attacked_audio,'morse');
         outputs.f_vals = f_vals;
         outputs.iter = iter;
         outputs.num_samples_vec = num_samples_vec;
@@ -153,8 +151,8 @@ for i = 1:num_iterations
 end
 
 % Now pack all the outputs into a struct.
-outputs.Attacking_Noise = Attacking_Noise;
-outputs.Attacked_audio_wavelet = Attacked_audio;
+outputs.Attacking_Noise = icwt(Attacking_Noise,'morse');
+outputs.Attacked_Audio = icwt(Attacked_audio,'morse');
 outputs.f_vals = f_vals;
 outputs.iter = iter;
 outputs.num_samples_vec = num_samples_vec;

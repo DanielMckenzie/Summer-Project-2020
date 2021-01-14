@@ -107,7 +107,6 @@ while num_attacked_sounds <= num_attack
     Attacked_Sounds_Cell{num_attacked_sounds,2} = outputs.Attacking_Noise;
     Attacked_Sounds_Cell{num_attacked_sounds,3} = outputs.Attacked_image;
     % == Store distortion in wavelet domain
-    % MEASURE LOUDNESS AND STORE HERE
     ell_0_difference_wavelet(num_attacked_sounds) = outputs.Wavelet_distortion_ell_0;
     ell_2_difference_wavelet(num_attacked_sounds) = outputs.Wavelet_distortion_ell_2;
     

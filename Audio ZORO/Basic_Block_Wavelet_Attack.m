@@ -11,7 +11,7 @@ function_params.net = trainedNet;
 sz = function_params.net.Layers(1).InputSize;
 function_params.kappa = 0.1;
 
-[sound_proto,fs] = audioread('testSounds/0ea0e2f4_nohash_0.wav');
+[sound_proto,fs] = audioread('testSounds/down/0c40e715_nohash_0.wav');
 % Perform wavelet transform
 [target_audio_wavelet,~] = cwt(sound_proto,'morse');
 function_params.target_audio_wavelet = target_audio_wavelet;
@@ -55,6 +55,5 @@ ZORO_params.x0 = zeros(function_params.D,1);
 outputs = BCD_ZORO_Adversarial_Attacks(function_handle,function_params,ZORO_params);
 
 % Play attacked sound
-attacked_audio_wavelet = outputs.Attacked_audio_wavelet;
-attacked_audio = icwt(attacked_audio_wavelet,'morse');
-sound(attacked_audio,fs);
+Attacked_Audio = outputs.Attacked_Audio;
+sound(Attacked_Audio,fs);
