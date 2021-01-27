@@ -31,6 +31,7 @@ D = ZORO_params.D;
 % =========== Initialize some vectors 
 f_vals = zeros(num_iterations,1);
 time_vec = zeros(num_iterations,1);
+num_samples_vec = zeros(num_iterations,1);
 
 num_samples = 4*sparsity; 
 cosamp_params.maxiterations = ZORO_params.cosamp_max_iter;
