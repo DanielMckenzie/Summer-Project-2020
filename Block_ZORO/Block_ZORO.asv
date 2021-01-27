@@ -1,4 +1,4 @@
-function [x_hat,f_vals,time_vec,num_samples_vec] = Block_ZORO(function_handle,function_params,ZORO_params)
+function [x_hat,f_vals,time_vec,gradient_norm,num_samples_vec] = Block_ZORO(function_handle,function_params,ZORO_params)
 
 % Basic Implementation of ZORO with flexible sensing matrix. 
 % ======================== INPUTS ================================= %
@@ -22,22 +22,60 @@ function [x_hat,f_vals,time_vec,num_samples_vec] = Block_ZORO(function_handle,fu
 x = ZORO_params.x0;
 Type = ZORO_params.Type;
 sparsity = ZORO_params.sparsity;   
-num_iterations = ZORO_params.num_iterations;    
-step_size = ZORO_params.step_size;
-max_time = ZORO_params.max_time;
-D = ZORO_params.D;
+
+    
+end
+
+if isempty(ZORO_params.sparsity)
+    error('sparsity value for gradients, ZORO_params.sparsity, is missing')
+else
+    
+end
+
+if isempty(ZORO_params.delta1)
+    error('parameter delta1 is missing')
+else
+    delta1 = ZORO_params.delta1;
+end
+
+if isempty(ZORO_params.init_grad_estimate)
+    grad_estimate = 100;
+else
+    grad_estimate = ZORO_params.init_grad_estimate;
+end
+
+if isempty(ZORO_params.num_iterations)
+    num_iterations = 100;
+else
+    num_iterations = ZORO_params.num_iterations;
+end
+
+if isempty(ZORO_params.step_size)
+    step_size = 1e-3;
+else
+    step_size = ZORO_params.step_size;
+end
+
+if isempty(ZORO_params.max_time)
+    max_time = 1e5;
+else
+    max_time = ZORO_params.max_time;
+end
+
+D = length(x);
 
 
 % =========== Initialize some vectors 
 f_vals = zeros(num_iterations,1);
 time_vec = zeros(num_iterations,1);
+gradient_norm = zeros(num_iterations,1);
 
+% hard coding the following for now, can make a param. later if we want.
 num_samples = 4*sparsity; 
 cosamp_params.maxiterations = ZORO_params.cosamp_max_iter;
-cosamp_params.tol = 0.25;
+cosamp_params.tol = 0.5;
 cosamp_params.sparsity = sparsity;
-cosamp_params.delta = ZORO_params.delta;
-oversampling_param = 1.1;
+oversampling_param = 1.5;
 
 % ========== Initialize the sensing matrix
 
@@ -104,6 +142,7 @@ if (Type == "BCD") || (Type == "BCCD")  % block coordinate descent methods.
     for i = 1:num_iterations
         tic
         %i
+        cosamp_params.delta = delta1 * norm(grad_estimate);
         coord_index = randi(J);% randomly select a block
         block = [(coord_index-1)*block_size + 1:coord_index*block_size];
         cosamp_params.block = block;
@@ -134,6 +173,7 @@ else
     for i = 1:num_iterations
         tic
         %i
+        cosamp_params.delta = delta1 * norm(grad_estimate);
         [f_est,grad_estimate] = CosampGradEstimate(function_handle,x,cosamp_params,function_params);
         x = x - step_size*grad_estimate;
         f_vals(i) = f_est;
