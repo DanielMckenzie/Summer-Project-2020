@@ -1,12 +1,16 @@
-% ===================== Testing Block ZORO algorithm ================ %
-% Test Block_ZORO, with a variety of different sensing matrix types.
-% Daniel McKenzie & Hanqin Cai 2019
-% Yuchen Lou 2020
-% ================================================================== %
+% ========================================================================
+% This script performs the benchmarking for Block-ZORO
+% Details about algorithms we benchmark against go here...
+%
+% HanQin Cai, Yuchen Lou and Daniel McKenzie January 2021
+%
+% ========================================================================
+
 
 clear, close all, clc
 
 % =================== Function and oracle parameters ================ %
+function_handle = "SparseQuadric";
 function_params.D = 2000; % ambient dimension
 ZORO_params.D = function_params.D;
 s = 200;
@@ -15,7 +19,7 @@ function_params.sigma = 0.001;  % noise level
 
 % ================================ ZORO Parameters ==================== %
 
-ZORO_params.num_iterations = 50; % number of iterations
+ZORO_params.num_iterations = 5; % number of iterations
 ZORO_params.sparsity = s;
 ZORO_params.step_size = 0.5;% Step size
 ZORO_params.x0 = 100*randn(function_params.D,1);
@@ -23,10 +27,6 @@ ZORO_params.x0 = 100*randn(function_params.D,1);
 %ZORO_params.init_grad_estimate = 2*norm(ZORO_params.x0(function_params.S));
 ZORO_params.max_time = 1e3;
 ZORO_params.num_blocks = 5;
-function_handle = "SparseQuadric";
-
-% === Initial
-[f0,~] = SparseQuadric(ZORO_params.x0,function_params);
 
 % ====================== Run Full ZORO ====================== %
 ZORO_params.Type = "Full";
@@ -39,8 +39,21 @@ ZORO_params.cosamp_max_iter = ceil(4*log(function_params.D));
 
 % === Plot
 xx = cumsum(num_samples_vec);
-semilogy([0,xx(1:end-1)], f_vals,'r*')
+semilogy([0;xx(1:end-1)], f_vals,'r*')
 hold on
+
+% ================== Run TestAlgorithm ================================= %
+grad_handle = "TestGradEst";
+grad_params.test = "test";
+[x_hat_d,f_vals_d,time_vec_d,num_samples_vec_d] = Benchmarker(function_handle,grad_handle,function_params,grad_params, ZORO_params);
+
+% == Plot 
+xx = cumsum(num_samples_vec_d);
+semilogy([0;xx(1:end-1)],f_vals_d,'g*')
+
+% CAUTION: The next block of code redefines the number of iterations so as
+% to be suitable for block coord. descent methods.
+% 
 
 % ===================== Run Block ZORO ===================== %
 ZORO_params.Type = "BCD";
@@ -53,7 +66,7 @@ ZORO_params.num_iterations = ZORO_params.num_blocks*ZORO_params.num_iterations; 
 
 % == Plot
 xx = cumsum(num_samples_vec_b);
-semilogy([0,xx(1:end-1)],f_vals_b,'k*')
+semilogy([0;xx(1:end-1)],f_vals_b,'k*')
 
 % ===================== Run Circulant Block ZORO ===================== %
 ZORO_params.Type = "BCCD";
@@ -62,7 +75,7 @@ ZORO_params.Type = "BCCD";
 
 % == Plot
 xx = cumsum(num_samples_vec_c);
-semilogy([0,xx(1:end-1)],f_vals_c,'b*')
+semilogy([0;xx(1:end-1)],f_vals_c,'b*')
 
-set(gca,'FontSize',16)
-legend({'ZORO', 'Block-ZORO-R', 'Block-ZORO-RC'})
+
+

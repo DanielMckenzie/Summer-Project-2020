@@ -9,8 +9,7 @@ clear, close all, clc
 % ================================ ZORO Parameters ==================== %
 
 ZORO_params.num_iterations = 100; % number of iterations
-ZORO_params.delta1 = 0.0005;
-ZORO_params.step_size = 0.1;% Step size
+ZORO_params.step_size = 0.5;% Step size
 ZORO_params.max_time = 300;
 function_handle = "SparseQuadric";
 
