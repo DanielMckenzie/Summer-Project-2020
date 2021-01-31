@@ -19,7 +19,7 @@ function_params.sigma = 0.001;  % noise level
 
 % ================================ ZORO Parameters ==================== %
 
-ZORO_params.num_iterations = 5; % number of iterations
+ZORO_params.num_iterations = 15; % number of iterations
 ZORO_params.sparsity = s;
 ZORO_params.step_size = 0.5;% Step size
 ZORO_params.x0 = 100*randn(function_params.D,1);
@@ -43,8 +43,9 @@ semilogy([0;xx(1:end-1)], f_vals,'r*')
 hold on
 
 % ================== Run TestAlgorithm ================================= %
-grad_handle = "TestGradEst";
-grad_params.test = "test";
+grad_handle = "SPSA";
+grad_params.num_samples = 100;
+grad_params.sampling_radius = 1e-4;
 [x_hat_d,f_vals_d,time_vec_d,num_samples_vec_d] = Benchmarker(function_handle,grad_handle,function_params,grad_params, ZORO_params);
 
 % == Plot 
